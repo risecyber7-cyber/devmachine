@@ -1,4 +1,4 @@
-name: Test Self-Hosted (Windows VM)
+name: Test Self-Hosted (No Downloads)
 
 on:
   workflow_dispatch:
@@ -10,82 +10,23 @@ jobs:
     runs-on: [self-hosted, win10]
 
     steps:
-      - name: Allow scripts for this job
+      - name: Basic info
         shell: powershell
         run: |
           Set-ExecutionPolicy Bypass -Scope Process -Force
-          Get-ExecutionPolicy -List
-
-      - name: Show runner context
-        shell: powershell
-        run: |
           "Runner: $env:RUNNER_NAME"
           "OS: $env:RUNNER_OS"
           "Arch: $env:RUNNER_ARCH"
           hostname
           whoami
+          Get-Date
 
-      - name: Install Git (reliable download, no winget)
-        shell: powershell
-        run: |
-          Set-ExecutionPolicy Bypass -Scope Process -Force
-          $ErrorActionPreference = "Stop"
-
-          function Download-WithRetry($Url, $OutFile, $Tries = 3) {
-            for ($i=1; $i -le $Tries; $i++) {
-              try {
-                if (Test-Path $OutFile) { Remove-Item $OutFile -Force -ErrorAction SilentlyContinue }
-                Write-Host "Download attempt $i/$Tries: $Url"
-                
-                # Prefer BITS (more reliable on Windows)
-                try {
-                  Start-BitsTransfer -Source $Url -Destination $OutFile -ErrorAction Stop
-                } catch {
-                  # Fallback to .NET WebClient
-                  $wc = New-Object System.Net.WebClient
-                  $wc.DownloadFile($Url, $OutFile)
-                }
-
-                if ((Test-Path $OutFile) -and ((Get-Item $OutFile).Length -gt 1024*1024)) {
-                  Write-Host "Downloaded OK: $OutFile"
-                  return
-                } else {
-                  throw "File missing or too small after download."
-                }
-              } catch {
-                Write-Host "Download failed: $($_.Exception.Message)"
-                if ($i -eq $Tries) { throw }
-                Start-Sleep -Seconds (5 * $i)
-              }
-            }
-          }
-
-          if (Get-Command git -ErrorAction SilentlyContinue) {
-            git --version
-            exit 0
-          }
-
-          $gitUrl = "https://github.com/git-for-windows/git/releases/latest/download/Git-64-bit.exe"
-          $gitExe = "$env:TEMP\Git-64-bit.exe"
-
-          Download-WithRetry -Url $gitUrl -OutFile $gitExe -Tries 3
-
-          Start-Process -FilePath $gitExe -ArgumentList "/VERYSILENT /NORESTART /SUPPRESSMSGBOXES" -Wait
-
-          # Refresh PATH
-          $env:Path = [Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [Environment]::GetEnvironmentVariable("Path","User")
-
-          git --version
-
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: System + Disk + Network
+      - name: Disk + Network
         shell: powershell
         run: |
           Set-ExecutionPolicy Bypass -Scope Process -Force
-          "Date:"; Get-Date
-          "CPU:"; Get-CimInstance Win32_Processor | Select Name,NumberOfCores,NumberOfLogicalProcessors
-          "RAM:"; Get-CimInstance Win32_ComputerSystem | Select TotalPhysicalMemory
-          "Disks:"; Get-PSDrive -PSProvider FileSystem | Format-Table -AutoSize
-          "IPConfig:"; ipconfig
+          Get-PSDrive -PSProvider FileSystem | Format-Table -AutoSize
+          ipconfig
