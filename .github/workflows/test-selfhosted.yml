@@ -1,4 +1,4 @@
-name: Self-hosted Windows VM - Setup + Test
+name: Test Self-Hosted (Windows VM)
 
 on:
   workflow_dispatch:
@@ -10,41 +10,73 @@ jobs:
     runs-on: [self-hosted, win10]
 
     steps:
-      - name: Allow scripts for this job (process scope)
+      - name: Allow scripts for this job
         shell: powershell
         run: |
           Set-ExecutionPolicy Bypass -Scope Process -Force
           Get-ExecutionPolicy -List
 
-      - name: Install Git (better checkout performance)
+      - name: Show runner context
+        shell: powershell
+        run: |
+          "Runner: $env:RUNNER_NAME"
+          "OS: $env:RUNNER_OS"
+          "Arch: $env:RUNNER_ARCH"
+          hostname
+          whoami
+
+      - name: Install Git (no winget)
         shell: powershell
         run: |
           Set-ExecutionPolicy Bypass -Scope Process -Force
-          if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
-            winget install --id Git.Git -e --source winget --accept-package-agreements --accept-source-agreements
+
+          if (Get-Command git -ErrorAction SilentlyContinue) {
+            git --version
+            exit 0
           }
-          $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+
+          $ErrorActionPreference = "Stop"
+          $gitUrl  = "https://github.com/git-for-windows/git/releases/latest/download/Git-64-bit.exe"
+          $gitExe  = "$env:TEMP\Git-64-bit.exe"
+
+          Invoke-WebRequest -Uri $gitUrl -OutFile $gitExe
+
+          # Silent install (typical Inno Setup switches)
+          Start-Process -FilePath $gitExe -ArgumentList "/VERYSILENT /NORESTART /SUPPRESSMSGBOXES" -Wait
+
+          # Refresh PATH in this process
+          $env:Path = [Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [Environment]::GetEnvironmentVariable("Path","User")
+
           git --version
 
-      - name: Install PowerShell 7 (optional)
+      - name: Checkout repository (now uses git)
+        uses: actions/checkout@v4
+
+      - name: Optional - Install PowerShell 7 (no winget)
         shell: powershell
         run: |
           Set-ExecutionPolicy Bypass -Scope Process -Force
-          if (-not (Get-Command pwsh -ErrorAction SilentlyContinue)) {
-            winget install --id Microsoft.PowerShell -e --source winget --accept-package-agreements --accept-source-agreements
-          }
-          $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
-          if (Get-Command pwsh -ErrorAction SilentlyContinue) { pwsh -v } else { "pwsh not found (optional)" }
 
-      - name: Checkout
-        uses: actions/checkout@v4
+          if (Get-Command pwsh -ErrorAction SilentlyContinue) {
+            pwsh -v
+            exit 0
+          }
+
+          $ErrorActionPreference = "Stop"
+          $msiUrl = "https://github.com/PowerShell/PowerShell/releases/latest/download/PowerShell-7.4.2-win-x64.msi"
+          $msi    = "$env:TEMP\pwsh.msi"
+
+          Invoke-WebRequest -Uri $msiUrl -OutFile $msi
+          Start-Process msiexec.exe -ArgumentList "/i `"$msi`" /qn /norestart" -Wait
+
+          $env:Path = [Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [Environment]::GetEnvironmentVariable("Path","User")
+
+          if (Get-Command pwsh -ErrorAction SilentlyContinue) { pwsh -v } else { "pwsh install skipped/failed" }
 
       - name: System + Disk + Network
         shell: powershell
         run: |
           Set-ExecutionPolicy Bypass -Scope Process -Force
-          "Hostname:"; hostname
-          "User:"; whoami
           "Date:"; Get-Date
           "CPU:"; Get-CimInstance Win32_Processor | Select Name,NumberOfCores,NumberOfLogicalProcessors
           "RAM:"; Get-CimInstance Win32_ComputerSystem | Select TotalPhysicalMemory
