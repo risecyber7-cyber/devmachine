@@ -2,19 +2,18 @@ name: Test Self-hosted Runner
 
 on:
   workflow_dispatch:
+  push:
+    branches: [ "main" ]
 
 jobs:
   test:
     runs-on: [self-hosted, win10]
     steps:
-      - name: Show system
+      - name: Show system info
         shell: pwsh
         run: |
           hostname
           whoami
           Get-Date
           ipconfig
-      - name: Show disk
-        shell: pwsh
-        run: |
           Get-PSDrive -PSProvider FileSystem | Format-Table -AutoSize
