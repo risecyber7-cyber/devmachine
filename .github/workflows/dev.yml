@@ -1,0 +1,15 @@
+jobs:
+  vpn:
+    runs-on: ubuntu-latest
+    environment: dev
+    steps:
+      - name: Install Tailscale
+        run: |
+          curl -fsSL https://tailscale.com/install.sh | sh
+
+      - name: Connect via Tailscale
+        env:
+          TS_AUTHKEY: ${{ secrets.TS_AUTHKEY }}
+        run: |
+          sudo tailscale up --authkey="$TS_AUTHKEY" --hostname="gha-dev"
+          tailscale status
