@@ -1,42 +1,52 @@
-
-name: Windows Self-Hosted VM Test
+name: Self-hosted Windows VM - Setup + Test
 
 on:
   workflow_dispatch:
   push:
-    branches:
-      - main
+    branches: [ "main" ]
 
 jobs:
   test:
     runs-on: [self-hosted, win10]
 
     steps:
+      - name: Print runner context
+        shell: powershell
+        run: |
+          Write-Host "Runner:" $env:RUNNER_NAME
+          Write-Host "OS:" $env:RUNNER_OS
+          Write-Host "Arch:" $env:RUNNER_ARCH
+          hostname
+          whoami
+
+      # Install Git (so checkout uses git instead of REST archive)
+      - name: Install Git
+        shell: powershell
+        run: |
+          if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
+            winget install --id Git.Git -e --source winget --accept-package-agreements --accept-source-agreements
+          }
+          $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+          git --version
+
+      # Optional: Install PowerShell 7 (pwsh)
+      - name: Install PowerShell 7 (optional)
+        shell: powershell
+        run: |
+          if (-not (Get-Command pwsh -ErrorAction SilentlyContinue)) {
+            winget install --id Microsoft.PowerShell -e --source winget --accept-package-agreements --accept-source-agreements
+          }
+          $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+          if (Get-Command pwsh -ErrorAction SilentlyContinue) { pwsh -v } else { Write-Host "pwsh not found (optional)" }
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Show basic system info
+      - name: System + Disk + Network
         shell: powershell
         run: |
-          Write-Host "Hostname:"
-          hostname
-          Write-Host "User:"
-          whoami
-          Write-Host "Date:"
-          Get-Date
-
-      - name: Show CPU and RAM
-        shell: powershell
-        run: |
-          Get-CimInstance Win32_Processor | Select Name,NumberOfCores,NumberOfLogicalProcessors
-          Get-CimInstance Win32_ComputerSystem | Select TotalPhysicalMemory
-
-      - name: Show Disk Info
-        shell: powershell
-        run: |
-          Get-PSDrive -PSProvider FileSystem | Format-Table -AutoSize
-
-      - name: Show Network Info
-        shell: powershell
-        run: |
-          ipconfig
+          Write-Host "Date:"; Get-Date
+          Write-Host "CPU:"; Get-CimInstance Win32_Processor | Select Name,NumberOfCores,NumberOfLogicalProcessors
+          Write-Host "RAM:"; Get-CimInstance Win32_ComputerSystem | Select TotalPhysicalMemory
+          Write-Host "Disks:"; Get-PSDrive -PSProvider FileSystem | Format-Table -AutoSize
+          Write-Host "IPConfig:"; ipconfig
