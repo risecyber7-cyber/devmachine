@@ -25,53 +25,60 @@ jobs:
           hostname
           whoami
 
-      - name: Install Git (no winget)
+      - name: Install Git (reliable download, no winget)
         shell: powershell
         run: |
           Set-ExecutionPolicy Bypass -Scope Process -Force
+          $ErrorActionPreference = "Stop"
+
+          function Download-WithRetry($Url, $OutFile, $Tries = 3) {
+            for ($i=1; $i -le $Tries; $i++) {
+              try {
+                if (Test-Path $OutFile) { Remove-Item $OutFile -Force -ErrorAction SilentlyContinue }
+                Write-Host "Download attempt $i/$Tries: $Url"
+                
+                # Prefer BITS (more reliable on Windows)
+                try {
+                  Start-BitsTransfer -Source $Url -Destination $OutFile -ErrorAction Stop
+                } catch {
+                  # Fallback to .NET WebClient
+                  $wc = New-Object System.Net.WebClient
+                  $wc.DownloadFile($Url, $OutFile)
+                }
+
+                if ((Test-Path $OutFile) -and ((Get-Item $OutFile).Length -gt 1024*1024)) {
+                  Write-Host "Downloaded OK: $OutFile"
+                  return
+                } else {
+                  throw "File missing or too small after download."
+                }
+              } catch {
+                Write-Host "Download failed: $($_.Exception.Message)"
+                if ($i -eq $Tries) { throw }
+                Start-Sleep -Seconds (5 * $i)
+              }
+            }
+          }
 
           if (Get-Command git -ErrorAction SilentlyContinue) {
             git --version
             exit 0
           }
 
-          $ErrorActionPreference = "Stop"
-          $gitUrl  = "https://github.com/git-for-windows/git/releases/latest/download/Git-64-bit.exe"
-          $gitExe  = "$env:TEMP\Git-64-bit.exe"
+          $gitUrl = "https://github.com/git-for-windows/git/releases/latest/download/Git-64-bit.exe"
+          $gitExe = "$env:TEMP\Git-64-bit.exe"
 
-          Invoke-WebRequest -Uri $gitUrl -OutFile $gitExe
+          Download-WithRetry -Url $gitUrl -OutFile $gitExe -Tries 3
 
-          # Silent install (typical Inno Setup switches)
           Start-Process -FilePath $gitExe -ArgumentList "/VERYSILENT /NORESTART /SUPPRESSMSGBOXES" -Wait
 
-          # Refresh PATH in this process
+          # Refresh PATH
           $env:Path = [Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [Environment]::GetEnvironmentVariable("Path","User")
 
           git --version
 
-      - name: Checkout repository (now uses git)
+      - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Optional - Install PowerShell 7 (no winget)
-        shell: powershell
-        run: |
-          Set-ExecutionPolicy Bypass -Scope Process -Force
-
-          if (Get-Command pwsh -ErrorAction SilentlyContinue) {
-            pwsh -v
-            exit 0
-          }
-
-          $ErrorActionPreference = "Stop"
-          $msiUrl = "https://github.com/PowerShell/PowerShell/releases/latest/download/PowerShell-7.4.2-win-x64.msi"
-          $msi    = "$env:TEMP\pwsh.msi"
-
-          Invoke-WebRequest -Uri $msiUrl -OutFile $msi
-          Start-Process msiexec.exe -ArgumentList "/i `"$msi`" /qn /norestart" -Wait
-
-          $env:Path = [Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [Environment]::GetEnvironmentVariable("Path","User")
-
-          if (Get-Command pwsh -ErrorAction SilentlyContinue) { pwsh -v } else { "pwsh install skipped/failed" }
 
       - name: System + Disk + Network
         shell: powershell
