@@ -10,43 +10,43 @@ jobs:
     runs-on: [self-hosted, win10]
 
     steps:
-      - name: Print runner context
+      - name: Allow scripts for this job (process scope)
         shell: powershell
         run: |
-          Write-Host "Runner:" $env:RUNNER_NAME
-          Write-Host "OS:" $env:RUNNER_OS
-          Write-Host "Arch:" $env:RUNNER_ARCH
-          hostname
-          whoami
+          Set-ExecutionPolicy Bypass -Scope Process -Force
+          Get-ExecutionPolicy -List
 
-      # Install Git (so checkout uses git instead of REST archive)
-      - name: Install Git
+      - name: Install Git (better checkout performance)
         shell: powershell
         run: |
+          Set-ExecutionPolicy Bypass -Scope Process -Force
           if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
             winget install --id Git.Git -e --source winget --accept-package-agreements --accept-source-agreements
           }
           $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
           git --version
 
-      # Optional: Install PowerShell 7 (pwsh)
       - name: Install PowerShell 7 (optional)
         shell: powershell
         run: |
+          Set-ExecutionPolicy Bypass -Scope Process -Force
           if (-not (Get-Command pwsh -ErrorAction SilentlyContinue)) {
             winget install --id Microsoft.PowerShell -e --source winget --accept-package-agreements --accept-source-agreements
           }
           $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
-          if (Get-Command pwsh -ErrorAction SilentlyContinue) { pwsh -v } else { Write-Host "pwsh not found (optional)" }
+          if (Get-Command pwsh -ErrorAction SilentlyContinue) { pwsh -v } else { "pwsh not found (optional)" }
 
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: System + Disk + Network
         shell: powershell
         run: |
-          Write-Host "Date:"; Get-Date
-          Write-Host "CPU:"; Get-CimInstance Win32_Processor | Select Name,NumberOfCores,NumberOfLogicalProcessors
-          Write-Host "RAM:"; Get-CimInstance Win32_ComputerSystem | Select TotalPhysicalMemory
-          Write-Host "Disks:"; Get-PSDrive -PSProvider FileSystem | Format-Table -AutoSize
-          Write-Host "IPConfig:"; ipconfig
+          Set-ExecutionPolicy Bypass -Scope Process -Force
+          "Hostname:"; hostname
+          "User:"; whoami
+          "Date:"; Get-Date
+          "CPU:"; Get-CimInstance Win32_Processor | Select Name,NumberOfCores,NumberOfLogicalProcessors
+          "RAM:"; Get-CimInstance Win32_ComputerSystem | Select TotalPhysicalMemory
+          "Disks:"; Get-PSDrive -PSProvider FileSystem | Format-Table -AutoSize
+          "IPConfig:"; ipconfig
