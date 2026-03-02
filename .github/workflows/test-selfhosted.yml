@@ -1,19 +1,42 @@
-name: Test Self-hosted Runner
+
+name: Windows Self-Hosted VM Test
 
 on:
   workflow_dispatch:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
 
 jobs:
   test:
     runs-on: [self-hosted, win10]
+
     steps:
-      - name: Show system info
-        shell: pwsh
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Show basic system info
+        shell: powershell
         run: |
+          Write-Host "Hostname:"
           hostname
+          Write-Host "User:"
           whoami
+          Write-Host "Date:"
           Get-Date
-          ipconfig
+
+      - name: Show CPU and RAM
+        shell: powershell
+        run: |
+          Get-CimInstance Win32_Processor | Select Name,NumberOfCores,NumberOfLogicalProcessors
+          Get-CimInstance Win32_ComputerSystem | Select TotalPhysicalMemory
+
+      - name: Show Disk Info
+        shell: powershell
+        run: |
           Get-PSDrive -PSProvider FileSystem | Format-Table -AutoSize
+
+      - name: Show Network Info
+        shell: powershell
+        run: |
+          ipconfig
