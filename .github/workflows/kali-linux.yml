@@ -1,0 +1,55 @@
+name: Kali Linux Full with Tailscale
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  kali:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Pull Kali Linux Full Image
+        run: |
+          docker pull kalilinux/kali-rolling
+
+      - name: Run Kali Container
+        run: |
+          docker run -d --name kali \
+            --privileged \
+            kalilinux/kali-rolling \
+            sleep infinity
+
+      - name: Install Tailscale inside Kali
+        run: |
+          docker exec kali bash -c "
+            apt update &&
+            apt install -y curl sudo iproute2 &&
+            curl -fsSL https://tailscale.com/install.sh | sh
+          "
+
+      - name: Start Tailscale
+        run: |
+          docker exec kali bash -c "
+            tailscale up --authkey=${{ secrets.TAILSCALE_AUTHKEY }} \
+              --hostname=kali-github \
+              --accept-routes
+          "
+
+      - name: Verify Tailscale
+        run: |
+          docker exec kali tailscale status
+          docker exec kali tailscale ip -4
+
+      - name: Keep Kali Alive
+        run: |
+          echo "Kali is running..."
+          while true; do
+            echo "Still alive at $(date)"
+            sleep 300
+          done
