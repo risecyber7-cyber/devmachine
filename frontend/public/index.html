@@ -6,12 +6,66 @@
     <meta name="theme-color" content="#1a1a2e" />
     <meta name="description" content="DevOps Project - Full Stack Application" />
     <title>DevOps Project</title>
+
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
       rel="stylesheet"
     />
+
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        background: #0f172a;
+        color: white;
+        text-align: center;
+        padding: 40px;
+      }
+
+      h1 {
+        margin-bottom: 30px;
+      }
+
+      .links {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        max-width: 400px;
+        margin: auto;
+      }
+
+      a {
+        text-decoration: none;
+        background: #2563eb;
+        padding: 12px 20px;
+        border-radius: 8px;
+        color: white;
+        font-weight: 500;
+        transition: 0.3s;
+      }
+
+      a:hover {
+        background: #1d4ed8;
+      }
+    </style>
   </head>
+
   <body>
+    <h1>🚀 DevOps Full Stack Project</h1>
+
+    <div class="links">
+      <a href="http://13.53.98.147" target="_blank">Main Application</a>
+
+      <a href="http://13.53.98.147/api/health" target="_blank">Backend API</a>
+
+      <a href="http://13.53.98.147:3001" target="_blank">Grafana Dashboard</a>
+
+      <a href="http://13.53.98.147:9090" target="_blank">Prometheus Metrics</a>
+
+      <a href="https://github.com/risecyber7-cyber/devmachine" target="_blank">
+        GitHub Repository
+      </a>
+    </div>
+
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
   </body>
