@@ -103,8 +103,8 @@ jobs:
             # Pull latest images
             docker-compose pull
 
-            # Restart services with zero downtime
-            docker-compose up -d --build --remove-orphans
+            # Restart services using pre-built images
+            docker-compose up -d --remove-orphans
 
             # Clean up old images
             docker image prune -f

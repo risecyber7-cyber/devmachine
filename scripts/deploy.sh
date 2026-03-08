@@ -26,9 +26,9 @@ ssh -i "${SSH_KEY}" -o StrictHostKeyChecking=accept-new "${EC2_USER}@${EC2_HOST}
   echo "Pulling latest changes..."
   git pull origin main
 
-  echo "Building and restarting containers..."
+  echo "Pulling and restarting containers..."
   docker-compose pull
-  docker-compose up -d --build --remove-orphans
+  docker-compose up -d --remove-orphans
 
   echo "Cleaning up old images..."
   docker image prune -f
