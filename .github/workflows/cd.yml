@@ -111,7 +111,7 @@ jobs:
 
             # Verify deployment
             sleep 10
-            curl -sf http://localhost:5000/api/health || echo "Health check failed!"
+            curl -sf http://localhost:5000/api/health || { echo "Health check failed!"; exit 1; }
 
             echo "Deployment complete! Version: ${{ needs.build-and-push.outputs.sha_short }}"
 
