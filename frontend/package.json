@@ -18,6 +18,9 @@
   "devDependencies": {
     "eslint": "^8.50.0"
   },
+  "overrides": {
+    "typescript": "4.9.5"
+  },
   "browserslist": {
     "production": [
       ">0.2%",
