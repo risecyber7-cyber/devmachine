@@ -16,7 +16,9 @@ echo "  Deploying to EC2: ${EC2_HOST}"
 echo "========================================="
 
 # Deploy via SSH
-ssh -i "${SSH_KEY}" -o StrictHostKeyChecking=no "${EC2_USER}@${EC2_HOST}" << 'DEPLOY_SCRIPT'
+# Note: For first-time connections, manually verify and add the host key:
+#   ssh-keyscan -H "${EC2_HOST}" >> ~/.ssh/known_hosts
+ssh -i "${SSH_KEY}" -o StrictHostKeyChecking=accept-new "${EC2_USER}@${EC2_HOST}" << 'DEPLOY_SCRIPT'
   set -euo pipefail
 
   cd /opt/app

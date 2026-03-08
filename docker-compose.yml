@@ -5,6 +5,7 @@ services:
   # Frontend - React.js Application
   # ──────────────────────────────────────────────
   frontend:
+    image: ${DOCKER_REGISTRY:-ghcr.io}/${IMAGE_PREFIX:-risecyber7-cyber/devmachine}/frontend:${IMAGE_TAG:-latest}
     build:
       context: ./frontend
       dockerfile: Dockerfile
@@ -22,6 +23,7 @@ services:
   # Backend - Node.js / Express API
   # ──────────────────────────────────────────────
   backend:
+    image: ${DOCKER_REGISTRY:-ghcr.io}/${IMAGE_PREFIX:-risecyber7-cyber/devmachine}/backend:${IMAGE_TAG:-latest}
     build:
       context: ./backend
       dockerfile: Dockerfile
