@@ -1,0 +1,149 @@
+.architecture-section {
+  margin: 3rem 0;
+}
+
+.architecture-section h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  color: #b3e5fc;
+  border-bottom: 2px solid #1e3a5f;
+  padding-bottom: 0.5rem;
+}
+
+.diagram-container {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(79, 195, 247, 0.15);
+  border-radius: 16px;
+  padding: 2rem;
+  overflow-x: auto;
+}
+
+.diagram {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 400px;
+}
+
+.diagram-row {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  width: 100%;
+}
+
+.split-row {
+  max-width: 500px;
+}
+
+.diagram-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 1rem 1.5rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  min-width: 160px;
+  text-align: center;
+  border: 1px solid;
+  transition: transform 0.2s;
+}
+
+.diagram-box:hover {
+  transform: scale(1.05);
+}
+
+.box-icon {
+  font-size: 1.5rem;
+}
+
+.diagram-box.developer {
+  background: rgba(156, 39, 176, 0.15);
+  border-color: rgba(156, 39, 176, 0.4);
+  color: #ce93d8;
+}
+
+.diagram-box.github {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #e0e0e0;
+}
+
+.diagram-box.cicd {
+  background: rgba(255, 152, 0, 0.15);
+  border-color: rgba(255, 152, 0, 0.4);
+  color: #ffb74d;
+}
+
+.diagram-box.docker {
+  background: rgba(3, 169, 244, 0.15);
+  border-color: rgba(3, 169, 244, 0.4);
+  color: #4fc3f7;
+}
+
+.diagram-box.registry {
+  background: rgba(0, 150, 136, 0.15);
+  border-color: rgba(0, 150, 136, 0.4);
+  color: #80cbc4;
+}
+
+.diagram-box.aws {
+  background: rgba(255, 193, 7, 0.15);
+  border-color: rgba(255, 193, 7, 0.4);
+  color: #ffd54f;
+}
+
+.diagram-box.nginx {
+  background: rgba(76, 175, 80, 0.15);
+  border-color: rgba(76, 175, 80, 0.4);
+  color: #81c784;
+}
+
+.diagram-box.frontend {
+  background: rgba(33, 150, 243, 0.15);
+  border-color: rgba(33, 150, 243, 0.4);
+  color: #64b5f6;
+}
+
+.diagram-box.backend {
+  background: rgba(139, 195, 74, 0.15);
+  border-color: rgba(139, 195, 74, 0.4);
+  color: #aed581;
+}
+
+.diagram-box.monitoring {
+  background: rgba(233, 30, 99, 0.15);
+  border-color: rgba(233, 30, 99, 0.4);
+  color: #f48fb1;
+}
+
+.diagram-arrow {
+  font-size: 1.5rem;
+  color: #4fc3f7;
+  text-align: center;
+}
+
+.diagram-arrow-split {
+  display: flex;
+  justify-content: center;
+  gap: 4rem;
+  font-size: 1.5rem;
+  color: #4fc3f7;
+}
+
+@media (max-width: 500px) {
+  .split-row {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .diagram-arrow-split {
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+}

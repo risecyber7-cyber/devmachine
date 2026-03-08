@@ -1,0 +1,100 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "description": "DevOps Backend Application Metrics",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "title": "Request Rate",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "targets": [
+        {
+          "expr": "rate(devops_backend_http_request_duration_seconds_count[5m])",
+          "legendFormat": "{{method}} {{route}} {{code}}"
+        }
+      ]
+    },
+    {
+      "title": "Response Time (p95)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, rate(devops_backend_http_request_duration_seconds_bucket[5m]))",
+          "legendFormat": "p95 latency"
+        }
+      ]
+    },
+    {
+      "title": "Memory Usage",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "targets": [
+        {
+          "expr": "devops_backend_process_resident_memory_bytes",
+          "legendFormat": "Resident Memory"
+        },
+        {
+          "expr": "devops_backend_process_heap_bytes",
+          "legendFormat": "Heap Memory"
+        }
+      ]
+    },
+    {
+      "title": "CPU Usage",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "targets": [
+        {
+          "expr": "rate(devops_backend_process_cpu_seconds_total[5m])",
+          "legendFormat": "CPU Usage"
+        }
+      ]
+    },
+    {
+      "title": "Active Handles",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 16 },
+      "targets": [
+        {
+          "expr": "devops_backend_nodejs_active_handles_total",
+          "legendFormat": "Active Handles"
+        }
+      ]
+    },
+    {
+      "title": "Event Loop Lag",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 6, "y": 16 },
+      "targets": [
+        {
+          "expr": "devops_backend_nodejs_eventloop_lag_seconds",
+          "legendFormat": "Event Loop Lag"
+        }
+      ]
+    },
+    {
+      "title": "Uptime",
+      "type": "stat",
+      "gridPos": { "h": 4, "w": 6, "x": 12, "y": 16 },
+      "targets": [
+        {
+          "expr": "devops_backend_process_start_time_seconds",
+          "legendFormat": "Process Start Time"
+        }
+      ]
+    }
+  ],
+  "schemaVersion": 39,
+  "tags": ["devops", "backend", "nodejs"],
+  "templating": { "list": [] },
+  "time": { "from": "now-1h", "to": "now" },
+  "title": "DevOps Backend Dashboard",
+  "uid": "devops-backend"
+}

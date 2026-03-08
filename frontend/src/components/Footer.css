@@ -1,0 +1,41 @@
+.footer {
+  background: rgba(26, 26, 46, 0.95);
+  border-top: 1px solid rgba(79, 195, 247, 0.2);
+  padding: 1.5rem 2rem;
+  margin-top: 3rem;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.footer-info {
+  margin-bottom: 0.8rem;
+}
+
+.author {
+  font-size: 0.95rem;
+  color: #b0bec5;
+  margin-bottom: 0.3rem;
+}
+
+.author strong {
+  color: #4fc3f7;
+}
+
+.linkedin-link {
+  font-size: 0.85rem;
+  color: #4fc3f7;
+  font-weight: 500;
+}
+
+.linkedin-link:hover {
+  color: #81d4fa;
+}
+
+.copyright {
+  font-size: 0.8rem;
+  color: #607d8b;
+}
