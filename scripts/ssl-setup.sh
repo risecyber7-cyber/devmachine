@@ -19,6 +19,7 @@ docker-compose stop nginx 2>/dev/null || true
 # Obtain certificate
 docker run --rm -it \
   -v "$(pwd)/certbot/conf:/etc/letsencrypt" \
+  -v "$(pwd)/certbot/lib:/var/lib/letsencrypt" \
   -v "$(pwd)/certbot/www:/var/www/certbot" \
   -p 80:80 \
   certbot/certbot certonly \

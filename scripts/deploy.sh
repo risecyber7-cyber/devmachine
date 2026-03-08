@@ -16,7 +16,9 @@ echo "  Deploying to EC2: ${EC2_HOST}"
 echo "========================================="
 
 # Deploy via SSH
-ssh -i "${SSH_KEY}" -o StrictHostKeyChecking=no "${EC2_USER}@${EC2_HOST}" << 'DEPLOY_SCRIPT'
+# Note: For first-time connections, manually verify and add the host key:
+#   ssh-keyscan -H "${EC2_HOST}" >> ~/.ssh/known_hosts
+ssh -i "${SSH_KEY}" -o StrictHostKeyChecking=accept-new "${EC2_USER}@${EC2_HOST}" << 'DEPLOY_SCRIPT'
   set -euo pipefail
 
   cd /opt/app
@@ -24,9 +26,9 @@ ssh -i "${SSH_KEY}" -o StrictHostKeyChecking=no "${EC2_USER}@${EC2_HOST}" << 'DE
   echo "Pulling latest changes..."
   git pull origin main
 
-  echo "Building and restarting containers..."
+  echo "Pulling and restarting containers..."
   docker-compose pull
-  docker-compose up -d --build --remove-orphans
+  docker-compose up -d --remove-orphans
 
   echo "Cleaning up old images..."
   docker image prune -f

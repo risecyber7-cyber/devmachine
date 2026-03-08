@@ -41,7 +41,9 @@ variable "ssh_public_key" {
 variable "ssh_allowed_cidr" {
   description = "CIDR blocks allowed for SSH access"
   type        = list(string)
-  default     = ["0.0.0.0/0"] # Restrict this in production!
+  # !! IMPORTANT: Restrict this to your IP in production !!
+  # Example: ["203.0.113.50/32"]
+  default     = ["0.0.0.0/0"]
 }
 
 variable "domain_name" {
