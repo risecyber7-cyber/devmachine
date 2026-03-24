@@ -1,1 +1,70 @@
-https://chatgpt.com/s/t_69c017c99ef48191a96aecd51ede297c
+You are a senior cybersecurity engineer and cloud architect.
+
+I have a production website: https://gokali.pro
+
+Your task is to perform a full security hardening plan and implementation guide.
+
+Focus on these areas:
+
+1. CDN & Edge Security
+
+* Recommend a CDN (Cloudflare, AWS CloudFront, etc.)
+* Explain step-by-step setup
+* Enable WAF rules (OWASP Top 10 protection)
+* Configure rate limiting (prevent brute force, DDoS)
+* Enable bot protection and challenge system
+* Enforce HTTPS with HSTS
+* Configure caching rules safely (avoid caching sensitive data)
+
+2. XSS Protection (Critical)
+
+* Identify all possible XSS vectors (reflected, stored, DOM-based)
+* Implement Content Security Policy (CSP) with strict rules
+* Sanitize all inputs (server-side + client-side)
+* Use secure frameworks or libraries for escaping
+* Disable inline scripts where possible
+* Add HTTP security headers:
+
+  * X-XSS-Protection
+  * X-Content-Type-Options
+  * Content-Security-Policy
+  * Referrer-Policy
+
+3. Backend Security
+
+* Validate and sanitize all inputs
+* Implement proper authentication & session management
+* Use secure cookies (HttpOnly, Secure, SameSite)
+* Protect APIs against injection attacks
+* Add rate limiting on APIs
+
+4. Infrastructure Security
+
+* Use firewall rules (block unnecessary ports)
+* Enable logging and monitoring
+* Setup alerts for suspicious activity
+* Use least privilege access
+
+5. Deployment Security
+
+* Secrets management (no hardcoded keys)
+* Secure CI/CD pipeline
+* Dependency vulnerability scanning
+
+6. Testing
+
+* Provide commands/tools for testing:
+
+  * XSS testing payloads
+  * SQL injection checks
+  * Header analysis (e.g., curl, securityheaders.com)
+* Suggest tools like Burp Suite, OWASP ZAP
+
+7. Deliverables
+
+* Step-by-step actionable guide
+* Config snippets (NGINX, Apache, Cloudflare)
+* Example CSP policy
+* Checklist to verify security
+
+Be practical. No theory. Give exact configs, commands, and real-world implementation steps.
